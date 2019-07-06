@@ -5,6 +5,8 @@
     <RootNamespace>Elastic.Apm.AspNetCore</RootNamespace>
     <VersionPrefix>1.0.0</VersionPrefix>
     <VersionSuffix>beta1</VersionSuffix>
+    <VersionPrefix Condition="'$(BUILD_BUILDID)' != ''">$(VersionPrefix).$(BUILD_BUILDID)</VersionPrefix>
+    <VersionSuffix Condition="'$(BUILD_SOURCEBRANCHNAME)' != '' And '$(BUILD_SOURCEBRANCHNAME)' != 'master'">$(VersionSuffix)-rc</VersionSuffix>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\build\elasticapm.snk</AssemblyOriginatorKeyFile>
     <DelaySign>false</DelaySign>
@@ -16,6 +18,7 @@
     <PackageIconUrl>https://raw.githubusercontent.com/elastic/apm-agent-dotnet/master/build/nuget-icon.png</PackageIconUrl>
     <Description>Elastic APM for ASP.NET Core. This package contains auto instrumentation for ASP.NET Core. See: https://github.com/elastic/apm-agent-dotnet/tree/master/docs</Description>
     <PackageTags>apm, monitoring, elastic, elasticapm, analytics, aspnetcore</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Elastic.Apm\Elastic.Apm.csproj" />
