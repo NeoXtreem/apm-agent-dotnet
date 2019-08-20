@@ -42,8 +42,8 @@ namespace Elastic.Apm.AspNetCore
 			_configuration = configuration;
 			_configuration.GetSection("ElasticApm")?.GetReloadToken().RegisterChangeCallback(ChangeCallback, configuration.GetSection("ElasticApm"));
 
-			_stackTraceLimit =
-				new Lazy<int>(() => ParseStackTraceLimit(ReadFallBack(Keys.StackTraceLimit, ConfigConsts.EnvVarNames.StackTraceLimit)));
+			_stackTraceLimit = new Lazy<int>(() =>
+				ParseStackTraceLimit(ReadFallBack(Keys.StackTraceLimit, ConfigConsts.EnvVarNames.StackTraceLimit)));
 
 			_spanFramesMinDurationInMilliseconds = new Lazy<double>(() =>
 				ParseSpanFramesMinDurationInMilliseconds(ReadFallBack(Keys.SpanFramesMinDuration, ConfigConsts.EnvVarNames.SpanFramesMinDuration)));

@@ -2,7 +2,6 @@
 using Elastic.Apm.Logging;
 using Elastic.Apm.Tests.Mocks;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Elastic.Apm.AspNetCore.Extensions;
 using Xunit;
 
