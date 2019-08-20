@@ -14,11 +14,11 @@ namespace Elastic.Apm.AspNetCore.Tests
 	/// Tests that use a real ASP.NET Core application.
 	/// </summary>
 	[Collection("DiagnosticListenerTest")] // To avoid tests from DiagnosticListenerTests running in parallel with this we add them to 1 collection.
-	public class MicrosoftExtensionsConfigIntegrationTests : IClassFixture<CustomWebApplicationFactory<FakeAspNetCoreSampleAppStartup>>, IDisposable
+	public class ApplicationConfigurationReaderIntegrationTests : IClassFixture<CustomWebApplicationFactory<FakeAspNetCoreSampleAppStartup>>, IDisposable
 	{
 		private readonly CustomWebApplicationFactory<FakeAspNetCoreSampleAppStartup> _factory;
 
-		public MicrosoftExtensionsConfigIntegrationTests(CustomWebApplicationFactory<FakeAspNetCoreSampleAppStartup> factory) => _factory = factory;
+		public ApplicationConfigurationReaderIntegrationTests(CustomWebApplicationFactory<FakeAspNetCoreSampleAppStartup> factory) => _factory = factory;
 
 		/// <summary>
 		/// Starts the app with an invalid config and makes sure the agent logs that the URL was invalid.
@@ -28,7 +28,7 @@ namespace Elastic.Apm.AspNetCore.Tests
 		{
 			var logger = new TestLogger();
 
-			var config = new ApplicationConfigurationReader(MicrosoftExtensionsConfigTests.GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_invalid.json"), logger);
+			var config = new ApplicationConfigurationReader(ApplicationConfigurationReaderTests.GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_invalid.json"), logger);
 
 			using (var agent = new ApmAgent(new AgentComponents(payloadSender: new MockPayloadSender(), configurationReader: config, logger: logger)))
 			using (var client = TestHelper.GetClient(_factory, agent))

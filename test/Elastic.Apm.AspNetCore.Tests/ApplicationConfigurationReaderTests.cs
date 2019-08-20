@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Elastic.Apm.Config;
 using Elastic.Apm.Logging;
 using Elastic.Apm.Tests.Mocks;
@@ -26,15 +23,14 @@ namespace Elastic.Apm.AspNetCore.Tests
 		[Fact]
 		public void ReadValidConfigsFromAppSettingsJson()
 		{
-			var config = new ApplicationConfigurationReader(GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_valid.json"),
-				new TestLogger());
+			var config = new ApplicationConfigurationReader(GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_valid.json"), new TestLogger());
 			config.LogLevel.Should().Be(LogLevel.Debug);
 			config.ServerUrls.Single().Should().Be(new Uri("http://myServerFromTheConfigFile:8080"));
 			config.ServiceName.Should().Be("My_Test_Application");
 			config.CaptureHeaders.Should().BeFalse();
 			config.TransactionSampleRate.Should().Be(0.456);
 			config.CaptureBody.Should().Be(ConfigConsts.SupportedValues.CaptureBodyAll);
-			var supportedContentTypes = new List<string>() { "application/x-www-form-urlencoded*", "text/*", "application/json*", "application/xml*" };
+			var supportedContentTypes = new[] { "application/x-www-form-urlencoded*", "text/*", "application/json*", "application/xml*" };
 			config.CaptureBodyContentTypes.Should().BeEquivalentTo(supportedContentTypes);
 		}
 
@@ -49,17 +45,15 @@ namespace Elastic.Apm.AspNetCore.Tests
 			var config = new ApplicationConfigurationReader(GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_invalid.json"), logger);
 			config.LogLevel.Should().Be(LogLevel.Error);
 			logger.Lines.Should().NotBeEmpty();
-			logger.Lines.Single().Should()
-				.ContainAll(
-					$"{{{nameof(ApplicationConfigurationReader)}}}",
-					"Failed parsing log level from",
-					ApplicationConfigurationReader.Origin,
-					ApplicationConfigurationReader.Keys.LogLevel,
-					"Defaulting to "
-				);
+			logger.Lines.Single().Should().ContainAll(
+				$"{{{nameof(ApplicationConfigurationReader)}}}",
+				"Failed parsing log level from",
+				ApplicationConfigurationReader.Origin,
+				ApplicationConfigurationReader.Keys.LogLevel,
+				"Defaulting to ");
 
 			config.CaptureHeaders.Should().BeTrue();
-			config.TransactionSampleRate.Should().Be(1.0);
+			config.TransactionSampleRate.Should().Be(1d);
 		}
 
 		/// <summary>
