@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using Elastic.Apm.Logging;
-using Elastic.Apm.Tests.Mocks;
 using FluentAssertions;
 using Elastic.Apm.AspNetCore.Extensions;
 using Xunit;
