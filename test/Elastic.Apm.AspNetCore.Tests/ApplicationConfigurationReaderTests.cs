@@ -106,7 +106,7 @@ namespace Elastic.Apm.AspNetCore.Tests
 			config.ServiceName.Should().Be(serviceName);
 			config.ServiceVersion.Should().Be(serviceVersion);
 			config.SecretToken.Should().Be(secretToken);
-			config.CaptureHeaders.Should().Be(false);
+			config.CaptureHeaders.Should().BeFalse();
 			config.TransactionSampleRate.Should().Be(0.123);
 		}
 
