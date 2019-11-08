@@ -11,7 +11,6 @@ namespace Elastic.Apm.AspNetFullFramework
 	internal class ApplicationConfigurationReader : AbstractConfigurationWithEnvFallbackReader
 	{
 		private const string Origin = "System.Configuration.ConfigurationManager.AppSettings";
-
 		private readonly IApmLogger _logger;
 
 		public ApplicationConfigurationReader(IApmLogger logger = null)

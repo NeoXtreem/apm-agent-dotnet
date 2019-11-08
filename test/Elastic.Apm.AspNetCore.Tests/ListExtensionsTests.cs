@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using FluentAssertions;
 using Elastic.Apm.AspNetCore.Extensions;
+using FluentAssertions;
 using Xunit;
 
 namespace Elastic.Apm.AspNetCore.Tests

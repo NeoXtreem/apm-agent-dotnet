@@ -16,15 +16,13 @@ namespace Elastic.Apm.AspNetCore
 		private readonly IConfiguration _configuration;
 		private readonly IApmLogger _logger;
 
-		public ApplicationConfigurationReader(IConfiguration configuration, IApmLogger logger, string defaultEnvironmentName)
-			: base(logger, defaultEnvironmentName, nameof(ApplicationConfigurationReader))
+		public ApplicationConfigurationReader(IConfiguration configuration, IApmLogger logger, string environmentName)
+			: base(logger, environmentName, nameof(ApplicationConfigurationReader))
 		{
 			_logger = logger?.Scoped(nameof(ApplicationConfigurationReader));
-			_configuration = configuration;
 
-			_configuration.GetSection("ElasticApm")?
-				.GetReloadToken()
-				.RegisterChangeCallback(ChangeCallback, configuration.GetSection("ElasticApm"));
+			_configuration = configuration;
+			_configuration.GetSection("ElasticApm")?.GetReloadToken().RegisterChangeCallback(ChangeCallback, configuration.GetSection("ElasticApm"));
 		}
 
 		public override LogLevel LogLevel

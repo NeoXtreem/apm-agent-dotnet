@@ -82,13 +82,13 @@ namespace Elastic.Apm.Config
 
 		protected string ParseSecretToken(ConfigurationKeyValue kv) => kv is null || string.IsNullOrEmpty(kv.Value) ? null : kv.Value;
 
-        protected bool ParseCaptureHeaders(ConfigurationKeyValue kv) => ParseBoolOption(kv, DefaultValues.CaptureHeaders, "CaptureHeaders");
+		protected bool ParseCaptureHeaders(ConfigurationKeyValue kv) => ParseBoolOption(kv, DefaultValues.CaptureHeaders, "CaptureHeaders");
 
 		protected LogLevel ParseLogLevel(ConfigurationKeyValue kv)
 		{
 			if (TryParseLogLevel(kv?.Value, out var level)) return level;
 
-			if (kv?.Value == null)
+			if (kv?.Value is null)
 				_logger?.Debug()?.Log("No log level provided. Defaulting to log level '{DefaultLogLevel}'", ConsoleLogger.DefaultLogLevel);
 			else
 			{
@@ -106,7 +106,7 @@ namespace Elastic.Apm.Config
 		private IReadOnlyList<Uri> ParseServerUrlsImpl(ConfigurationKeyValue kv)
 		{
 			var list = new List<Uri>();
-			if (kv == null || string.IsNullOrEmpty(kv.Value)) return LogAndReturnDefault().AsReadOnly();
+			if (kv is null || string.IsNullOrEmpty(kv.Value)) return LogAndReturnDefault().AsReadOnly();
 
 			var uriStrings = kv.Value.Split(',');
 			foreach (var u in uriStrings)

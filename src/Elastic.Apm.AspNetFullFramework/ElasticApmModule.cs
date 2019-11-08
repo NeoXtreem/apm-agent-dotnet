@@ -27,16 +27,14 @@ namespace Elastic.Apm.AspNetFullFramework
 		private HttpApplication _context;
 		private IApmLogger _logger;
 
-        // ReSharper disable once ImpureMethodCallOnReadonlyValueField
-        public ElasticApmModule() => _dbgInstanceName = DbgInstanceNameGenerator.Generate($"{nameof(ElasticApmModule)}.#");
+		// ReSharper disable once ImpureMethodCallOnReadonlyValueField
+		public ElasticApmModule() => _dbgInstanceName = DbgInstanceNameGenerator.Generate($"{nameof(ElasticApmModule)}.#");
 
 		public void Init(HttpApplication context)
 		{
-			var isInitedByThisCall = InitOnceForAllInstancesUnderLock(_dbgInstanceName);
-
 			_logger = Agent.Instance.Logger.Scoped(_dbgInstanceName);
 
-			if (isInitedByThisCall)
+			if (InitOnceForAllInstancesUnderLock(_dbgInstanceName))
 			{
 				_logger.Debug()
 					?.Log("Initialized Agent singleton. .NET runtime: {DotNetRuntimeDescription}; IIS: {IisVersion}",
@@ -199,9 +197,9 @@ namespace Elastic.Apm.AspNetFullFramework
 			_currentTransaction = null;
 		}
 
-		private void SendErrorEventIfPresent(HttpContext httpCtx)
+		private void SendErrorEventIfPresent(HttpContext context)
 		{
-			var lastError = httpCtx.Server.GetLastError();
+			var lastError = context.Server.GetLastError();
 			if (lastError != null) _currentTransaction.CaptureException(lastError);
 		}
 
@@ -235,6 +233,7 @@ namespace Elastic.Apm.AspNetFullFramework
 				// which is unfortunately an internal property of an internal class in System.Web assembly so we use reflection to get it
 				const string versionInfoTypeName = "System.Web.Util.VersionInfo";
 				var versionInfoType = typeof(HttpRuntime).Assembly.GetType(versionInfoTypeName);
+
 				if (versionInfoType == null)
 				{
 					logger.Error()
@@ -244,8 +243,8 @@ namespace Elastic.Apm.AspNetFullFramework
 				}
 
 				const string engineVersionPropertyName = "EngineVersion";
-				var engineVersionProperty = versionInfoType.GetProperty(engineVersionPropertyName,
-					BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+				var engineVersionProperty = versionInfoType.GetProperty(engineVersionPropertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static);
+
 				if (engineVersionProperty == null)
 				{
 					logger.Error()
@@ -255,7 +254,7 @@ namespace Elastic.Apm.AspNetFullFramework
 				}
 
 				var engineVersionPropertyValue = (string)engineVersionProperty.GetValue(null);
-				if (engineVersionPropertyValue == null)
+				if (engineVersionPropertyValue is null)
 				{
 					logger.Error()
 						?.Log("Property {PropertyName} (in type {TypeName}) is of type {TypeName} and not a string as expected" +

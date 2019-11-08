@@ -49,7 +49,7 @@ namespace Elastic.Apm.AspNetCore.Tests
 		[Fact]
 		public void ReadInvalidLogLevelConfigFromAppsettingsJson()
 		{
-			Environment.SetEnvironmentVariable(ConfigConsts.EnvVarNames.Environment, "");
+			Environment.SetEnvironmentVariable(ConfigConsts.EnvVarNames.Environment, string.Empty);
 			var logger = new TestLogger();
 			var config = new ApplicationConfigurationReader(GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_invalid.json"), logger, "test");
 			config.LogLevel.Should().Be(LogLevel.Error);
@@ -59,8 +59,7 @@ namespace Elastic.Apm.AspNetCore.Tests
 				"Failed parsing log level from",
 				ApplicationConfigurationReader.Origin,
 				ConfigConsts.KeyNames.LogLevel,
-				"Defaulting to "
-			);
+				"Defaulting to ");
 
 			config.Environment.Should().Be("test");
 			config.CaptureHeaders.Should().BeTrue();
@@ -85,8 +84,7 @@ namespace Elastic.Apm.AspNetCore.Tests
 				ApplicationConfigurationReader.Origin,
 				ConfigConsts.KeyNames.LogLevel,
 				"Defaulting to ",
-				"DbeugMisspelled"
-			);
+				"DbeugMisspelled");
 		}
 
 		/// <summary>
@@ -135,41 +133,6 @@ namespace Elastic.Apm.AspNetCore.Tests
 			logger.Lines.Should().NotBeEmpty();
 		}
 
-
-		[Fact]
-		public void MicrosoftExtensionsConfig_falls_back_on_env_vars()
-		{
-			var configBeforeEnvVarSet = new ApplicationConfigurationReader(GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_valid.json"),
-				new NoopLogger(), "test");
-			configBeforeEnvVarSet.FlushInterval.Should().Be(ConfigConsts.DefaultValues.FlushIntervalInMilliseconds.Milliseconds());
-
-			var flushIntervalVal = 98.Seconds();
-			Environment.SetEnvironmentVariable(ConfigConsts.EnvVarNames.FlushInterval, (int)flushIntervalVal.TotalSeconds + "s");
-
-			var configAfterEnvVarSet = new ApplicationConfigurationReader(GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_valid.json"),
-				new NoopLogger(), "test");
-			configAfterEnvVarSet.FlushInterval.Should().Be(flushIntervalVal);
-		}
-
-		[Fact]
-		public void MicrosoftExtensionsConfig_has_precedence_over_on_env_vars()
-		{
-			const double transactionSampleRateEnvVarValue = 0.851;
-			const double transactionSampleRateValueInAppSettings = 0.456;
-
-			var configBeforeEnvVarSet = new ApplicationConfigurationReader(GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_valid.json"),
-				new NoopLogger(), "test");
-			configBeforeEnvVarSet.TransactionSampleRate.Should().Be(transactionSampleRateValueInAppSettings);
-
-			Environment.SetEnvironmentVariable(ConfigConsts.EnvVarNames.TransactionSampleRate,
-				transactionSampleRateEnvVarValue.ToString(CultureInfo.InvariantCulture));
-			new EnvironmentConfigurationReader(new NoopLogger()).TransactionSampleRate.Should().Be(transactionSampleRateEnvVarValue);
-
-			var configAfterEnvVarSet = new ApplicationConfigurationReader(GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_valid.json"),
-				new NoopLogger(), "test");
-			configAfterEnvVarSet.TransactionSampleRate.Should().Be(transactionSampleRateValueInAppSettings);
-		}
-
         [Theory]
 		[ClassData(typeof(TransactionMaxSpansTestData))]
 		public void TransactionMaxSpansTest(string configurationValue, int expectedValue)
@@ -187,6 +150,35 @@ namespace Elastic.Apm.AspNetCore.Tests
 
 			// Assert
 			transactionMaxSpans.Should().Be(expectedValue);
+		}
+
+		[Fact]
+		public void MicrosoftExtensionsConfig_falls_back_on_env_vars()
+		{
+			var configBeforeEnvVarSet = new ApplicationConfigurationReader(GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_valid.json"), new NoopLogger(), "test");
+			configBeforeEnvVarSet.FlushInterval.Should().Be(ConfigConsts.DefaultValues.FlushIntervalInMilliseconds.Milliseconds());
+
+			var flushIntervalVal = 98.Seconds();
+			Environment.SetEnvironmentVariable(ConfigConsts.EnvVarNames.FlushInterval, (int)flushIntervalVal.TotalSeconds + "s");
+
+			var configAfterEnvVarSet = new ApplicationConfigurationReader(GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_valid.json"), new NoopLogger(), "test");
+			configAfterEnvVarSet.FlushInterval.Should().Be(flushIntervalVal);
+		}
+
+		[Fact]
+		public void MicrosoftExtensionsConfig_has_precedence_over_on_env_vars()
+		{
+			const double transactionSampleRateEnvVarValue = 0.851;
+			const double transactionSampleRateValueInAppSettings = 0.456;
+
+			var configBeforeEnvVarSet = new ApplicationConfigurationReader(GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_valid.json"), new NoopLogger(), "test");
+			configBeforeEnvVarSet.TransactionSampleRate.Should().Be(transactionSampleRateValueInAppSettings);
+
+			Environment.SetEnvironmentVariable(ConfigConsts.EnvVarNames.TransactionSampleRate, transactionSampleRateEnvVarValue.ToString(CultureInfo.InvariantCulture));
+			new EnvironmentConfigurationReader(new NoopLogger()).TransactionSampleRate.Should().Be(transactionSampleRateEnvVarValue);
+
+			var configAfterEnvVarSet = new ApplicationConfigurationReader(GetConfig($"TestConfigs{Path.DirectorySeparatorChar}appsettings_valid.json"), new NoopLogger(), "test");
+			configAfterEnvVarSet.TransactionSampleRate.Should().Be(transactionSampleRateValueInAppSettings);
 		}
 
 		internal static IConfiguration GetConfig(string path) => new ConfigurationBuilder().AddJsonFile(path).Build();
