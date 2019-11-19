@@ -92,7 +92,6 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Net.Http.WebRequest" />
-    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup Condition="'$(OS)' == 'WINDOWS_NT'">
     <Compile Include="Consts.cs" />
